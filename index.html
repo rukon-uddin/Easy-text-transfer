@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Text Transfer App</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <h1>Text Transfer App</h1>
@@ -13,17 +12,14 @@
     </form>
     
     <h2>Current Message:</h2>
-    <p id="currentMessage"><%= currentMessage %></p>
+    <p id="currentMessage"></p>
     
     <script>
         // Update current message without refreshing the page
-        $('#messageForm').submit(function(e) {
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            var message = $('#message').val();
-            
-            $.post('/', { message: message }, function() {
-                $('#currentMessage').text(message);
-            });
+            var message = document.getElementById('message').value;
+            document.getElementById('currentMessage').textContent = message;
         });
     </script>
 </body>
