@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Communication</title>
+</head>
+<body>
+    <h1>Text Communication</h1>
+    <textarea id="textArea" rows="10" cols="50"></textarea>
+    <button id="sendButton">Send</button>
+    <div id="receivedText"></div>
+
+    <script>
+        const textArea = document.getElementById('textArea');
+        const sendButton = document.getElementById('sendButton');
+        const receivedText = document.getElementById('receivedText');
+
+        sendButton.addEventListener('click', () => {
+            const text = textArea.value;
+            fetch('/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: text })
+            });
+            textArea.value = '';
+        });
+
+        function updateReceivedText(text) {
+            receivedText.innerHTML = `<p>Received: ${text}</p>`;
+        }
+
+        function pollForText() {
+            fetch('/receive')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.text) {
+                        updateReceivedText(data.text);
+                    }
+                    setTimeout(pollForText, 1000);
+                });
+        }
+
+        pollForText();
+    </script>
+</body>
+</html>
