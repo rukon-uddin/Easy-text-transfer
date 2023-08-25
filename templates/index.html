@@ -92,6 +92,7 @@
         sendButton.addEventListener('click', () => {
             const text = textArea.value;
             const uid = uniqueID.value;
+            console.log(text)
             fetch('/send', {
                 method: 'POST',
                 headers: {

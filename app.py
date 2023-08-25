@@ -10,6 +10,8 @@ app = Flask(__name__)
 ext = "redis://red-cjk4je337aks73ek7ilg:6379"
 redis_client = redis.StrictRedis.from_url(ext)
 
+# redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+
 
 @app.route('/')
 def index():
@@ -23,7 +25,7 @@ def send_text():
 
     for key, value in redis_client.hgetall('stored_text').items():
         current_time = time.time()
-        entry_parts = value.decode('utf-8').split(':')
+        entry_parts = value.decode('utf-8').split(';')
         timestamp = float(entry_parts[2])
 
         if (current_time - timestamp) > 300:
@@ -36,10 +38,10 @@ def send_text():
     # stored_text[data['uid']] = {'text': data['text'], 'timestamp': time.time()}
     entry = {
         "uid": data['uid'],
-        "text": data['text'],
+        "text": str(data['text']),
         "timestamp": str(time.time())
     }
-    redis_client.hset('stored_text', data['uid'], ":".join(entry.values()))
+    redis_client.hset('stored_text', data['uid'], ";".join(entry.values()))
     
     # print(redis_client.hgetall('stored_text'))
     return jsonify({'message': 'Text received successfully'})
@@ -54,7 +56,7 @@ def receive_text():
     if stored_entry is None:
         text = "ZqgQ9QOE2$sq5kr8p3Vg*GgGNq&"
     else:
-        stored_entry = stored_entry.decode('utf-8').split(':')
+        stored_entry = stored_entry.decode('utf-8').split(';')
         text = stored_entry[1]
         redis_client.hdel("stored_text", stored_entry[0])
     
