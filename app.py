@@ -5,7 +5,10 @@ import redis
 # stored_text = {}
 
 app = Flask(__name__)
-redis_client = redis.StrictRedis(host='103.14.145.154', port=32, db=0)
+
+
+ext = "redis://red-cjk4je337aks73ek7ilg:6379"
+redis_client = redis.StrictRedis.from_url(ext)
 
 
 @app.route('/')
