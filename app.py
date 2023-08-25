@@ -41,7 +41,7 @@ def send_text():
     }
     redis_client.hset('stored_text', data['uid'], ":".join(entry.values()))
     
-    print(redis_client.hgetall('stored_text'))
+    # print(redis_client.hgetall('stored_text'))
     return jsonify({'message': 'Text received successfully'})
 
 
@@ -50,7 +50,7 @@ def send_text():
 def receive_text():
     data = request.json
     stored_entry = redis_client.hget('stored_text', data["uid"])
-    print(redis_client.hgetall("stored_text"))
+    # print(redis_client.hgetall("stored_text"))
     if stored_entry is None:
         text = "ZqgQ9QOE2$sq5kr8p3Vg*GgGNq&"
     else:
