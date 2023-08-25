@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, jsonify
-from apscheduler.schedulers.background import BackgroundScheduler
 import time
+import redis
+
+# stored_text = {}
 
 app = Flask(__name__)
+redis_client = redis.StrictRedis(host='103.14.145.154', port=32, db=0)
 
-scheduler = BackgroundScheduler()
-scheduler.start()
-
-stored_text = {}
 
 @app.route('/')
 def index():
@@ -15,31 +14,51 @@ def index():
 
 @app.route('/send', methods=['POST'])
 def send_text():
-    global stored_text
+    # global stored_text
+    # keys_to_delete = [key for key, value in stored_text.items() if (current_time - value['timestamp']) > 60]
+    keys_to_delete = []
+
+    for key, value in redis_client.hgetall('stored_text').items():
+        current_time = time.time()
+        entry_parts = value.decode('utf-8').split(':')
+        timestamp = float(entry_parts[2])
+
+        if (current_time - timestamp) > 300:
+            keys_to_delete.append(key.decode('utf-8'))
+            
+    for key in keys_to_delete:
+        redis_client.hdel('stored_text', key)
+    
     data = request.json
-    stored_text[data['uid']] = {'text': data['text'], 'timestamp': time.time()}
-    print(stored_text)
+    # stored_text[data['uid']] = {'text': data['text'], 'timestamp': time.time()}
+    entry = {
+        "uid": data['uid'],
+        "text": data['text'],
+        "timestamp": str(time.time())
+    }
+    redis_client.hset('stored_text', data['uid'], ":".join(entry.values()))
+    
+    print(redis_client.hgetall('stored_text'))
     return jsonify({'message': 'Text received successfully'})
+
+
 
 @app.route('/receive', methods=['POST'])
 def receive_text():
-    global stored_text
     data = request.json
-    print(stored_text)
-    try:
-        text = stored_text[data["uid"]]["text"]
-    except:
+    stored_entry = redis_client.hget('stored_text', data["uid"])
+    print(redis_client.hgetall("stored_text"))
+    if stored_entry is None:
         text = "ZqgQ9QOE2$sq5kr8p3Vg*GgGNq&"
+    else:
+        stored_entry = stored_entry.decode('utf-8').split(':')
+        text = stored_entry[1]
+        redis_client.hdel("stored_text", stored_entry[0])
+    
+    
     return jsonify({'text': text})
 
-def clear_stored_data():
-    global stored_text
-    current_time = time.time()
-    keys_to_delete = [key for key, value in stored_text.items() if (current_time - value['timestamp']) > 250]
-    for key in keys_to_delete:
-        del stored_text[key]
 
-scheduler.add_job(clear_stored_data, 'interval', minutes=5)
 
 # if __name__ == "__main__":
 #     app.run(debug=True)

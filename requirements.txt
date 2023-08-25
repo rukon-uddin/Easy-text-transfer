@@ -10,3 +10,4 @@ packaging
 Werkzeug
 zipp
 apscheduler
+redis
