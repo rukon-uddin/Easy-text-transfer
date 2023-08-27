@@ -15,7 +15,15 @@ redis_client = redis.StrictRedis.from_url(ext)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('home.html')
+
+@app.route('/share_text')
+def shareText():
+    return render_template("shareText.html")
+
+@app.route('/get_text')
+def getText():
+    return render_template("getText.html")
 
 @app.route('/send', methods=['POST'])
 def send_text():

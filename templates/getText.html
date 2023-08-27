@@ -14,34 +14,17 @@
 </head>
 <body>
     <div class="container mt-2">
-        <div class="text-center">
-            <h1>Simple Text Share</h1>
-            <div class="mb-3 row">
-                <label for="uniqueid" class="col-sm-2 col-form-label">Unique ID</label>
-                <div class="col-sm-10">
-                  <input type="password" class="form-control" id="uniqueid">
-                </div>
-            </div>
-            <textarea id="textArea" class="form-control mb-3" rows="2"></textarea>
-        </div>
-        <div class="text-center">
-            <button id="sendButton" type="button" class="btn btn-primary btn-sl">Share</button>
-            <p id="successMessage" class="text-success mt-2" style="display: none;">Text shared successfully!</p>
-        </div>
-
         <div class="text-center mt-2">
             <h1>Get Text Using UID</h1>
             <div class="mb-3 row">
-                <label for="get_uniqueid" class="col-sm-2 col-form-label">Unique ID</label>
+                <label for="gtu_uniqueid" class="col-sm-2 col-form-label">Unique ID</label>
                 <div class="col-sm-10">
-                  <input type="password" class="form-control" id="get_uniqueid">
+                  <input type="password" class="form-control" id="gtu_uniqueid">
                 </div>
             </div>
             <button onClick=getText() id="get_text" type="button" class="btn btn-primary btn-sl">Get</button>
-            <textarea id="myInput" class="form-control mb-2 mt-3" rows="2"></textarea>
-            
+            <textarea id="gtu_myInput" class="form-control mb-2 mt-3" rows="2"></textarea>
         </div>
-
         <div class="text-center">
             <button onclick="copyFunction()" type="button" class="btn btn-success mt-1">Copy</button>
         </div>
@@ -49,15 +32,10 @@
     </div>
     
     <script>
-        const textArea = document.getElementById('textArea');
-        const sendButton = document.getElementById('sendButton');
-        const receivedText = document.getElementById('myInput');
-        var uniqueID = document.getElementById("uniqueid");
-        var get_uniqueID = document.getElementById("get_uniqueid");
+        const receivedText = document.getElementById('gtu_myInput');
+        var get_uniqueID = document.getElementById("gtu_uniqueid");
         get_uniqueID.value = ""
-        uniqueID.value = ""
         receivedText.value = ""
-        textArea.value = ""
         function getText() {
             const uid = get_uniqueID.value;
 
@@ -88,29 +66,7 @@
             copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
         }
-
-        sendButton.addEventListener('click', () => {
-            const text = textArea.value;
-            const uid = uniqueID.value;
-            console.log(text)
-            fetch('/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ text: text,  uid: uid})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message === 'Text received successfully') {
-                    showSuccessMessage();
-                }
-            })
-            .catch(error => {
-                console.error('Error sending/receiving text:', error);
-            });
-        });
-
+        
         function updateReceivedText(text) {
             receivedText.value = text;
         }
