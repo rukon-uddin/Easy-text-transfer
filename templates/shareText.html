@@ -16,42 +16,34 @@
     <div class="container mt-2">
         <div class="text-center">
             <h1>Simple Text Share</h1>
-            <div class="mb-3 row">
-                <label for="sts_uniqueid" class="col-sm-2 col-form-label">Unique ID</label>
-                <div class="col-sm-10">
-                  <input type="password" class="form-control" id="sts_uniqueid">
-                </div>
-            </div>
             <textarea id="sts_textArea" class="form-control mb-3" rows="2"></textarea>
         </div>
         <div class="text-center">
             <button id="sts_sendButton" type="button" class="btn btn-primary btn-sl">Share</button>
             <p id="successMessage" class="text-success mt-2" style="display: none;">Text shared successfully!</p>
+            <p id="uniqueIDField" class="text-success mt-2" style="display: none;"></p>
         </div>
     </div>
     
     <script>
         const textArea = document.getElementById('sts_textArea');
         const sendButton = document.getElementById('sts_sendButton');
-        var uniqueID = document.getElementById("sts_uniqueid");
-        uniqueID.value = ""
         textArea.value = ""
 
         sendButton.addEventListener('click', () => {
             const text = textArea.value;
-            const uid = uniqueID.value;
             console.log(text)
             fetch('/send', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ text: text,  uid: uid})
+                body: JSON.stringify({ text: text})
             })
             .then(response => response.json())
             .then(data => {
-                if (data.message === 'Text received successfully') {
-                    showSuccessMessage();
+                if (data.message) {
+                    showSuccessMessage(data.message);
                 }
             })
             .catch(error => {
@@ -62,9 +54,12 @@
         function updateReceivedText(text) {
             receivedText.value = text;
         }
-        function showSuccessMessage() {
+        function showSuccessMessage(data) {
             const successMessage = document.getElementById('successMessage');
+            const uniqueIDField = document.getElementById('uniqueIDField');
             successMessage.style.display = 'block';
+            uniqueIDField.style.display = 'block';
+            uniqueIDField.innerText = `Your unique ID is: ${data}`;
         }
 
     </script>

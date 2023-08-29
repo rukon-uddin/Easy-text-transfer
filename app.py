@@ -1,8 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 import time
 import redis
+import itertools
+import string
+import random
 
-# stored_text = {}
+glob_counter = 0
+characters = string.ascii_letters + string.digits + string.punctuation
+combinations = itertools.product(characters, repeat=2)
+combinations_as_strings = [''.join(combination) for combination in combinations]
+random_char_len = len(combinations_as_strings)
+
 
 app = Flask(__name__)
 
@@ -27,8 +35,10 @@ def getText():
 
 @app.route('/send', methods=['POST'])
 def send_text():
-    # global stored_text
-    # keys_to_delete = [key for key, value in stored_text.items() if (current_time - value['timestamp']) > 60]
+    global glob_counter
+    global combinations_as_strings
+    global random_char_len
+
     keys_to_delete = []
     try:
         for key, value in redis_client.hgetall('stored_text').items():
@@ -36,7 +46,7 @@ def send_text():
             entry_parts = value.decode('utf-8').split('4099058')
             timestamp = float(entry_parts[2])
 
-            if (current_time - timestamp) > 300:
+            if (current_time - timestamp) > 120:
                 keys_to_delete.append(key.decode('utf-8'))
                 
         for key in keys_to_delete:
@@ -44,25 +54,32 @@ def send_text():
     except:
         print("No data found")
     
+    unique_id = combinations_as_strings[glob_counter % random_char_len]
+
+    while redis_client.hget("stored_text", unique_id) != None:
+        unique_id = combinations_as_strings[glob_counter % random_char_len]
+        glob_counter = (glob_counter+1)%random_char_len
+
     data = request.json
-    # stored_text[data['uid']] = {'text': data['text'], 'timestamp': time.time()}
     entry = {
-        "uid": data['uid'],
+        "uid": unique_id,
         "text": str(data['text']),
         "timestamp": str(time.time())
     }
-    redis_client.hset('stored_text', data['uid'], "4099058".join(entry.values()))
+    redis_client.hset('stored_text', unique_id, "4099058".join(entry.values()))
     
     # print(redis_client.hgetall('stored_text'))
-    return jsonify({'message': 'Text received successfully'})
+    return jsonify({'message': unique_id})
 
 
 
 @app.route('/receive', methods=['POST'])
 def receive_text():
+
     data = request.json
+
     stored_entry = redis_client.hget('stored_text', data["uid"])
-    # print(redis_client.hgetall("stored_text"))
+
     if stored_entry is None:
         text = "ZqgQ9QOE2$sq5kr8p3Vg*GgGNq&"
     else:
