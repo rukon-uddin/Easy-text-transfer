@@ -10,13 +10,18 @@
                 font-size: 1.5rem;
             }
         }
+        textarea {
+        resize: none;
+        overflow: hidden;
+        min-height: 50px;
+        }
     </style>
 </head>
 <body>
     <div class="container mt-2">
         <div class="text-center">
             <h1>Simple Text Share</h1>
-            <textarea id="sts_textArea" class="form-control mb-3" rows="2"></textarea>
+            <textarea oninput="auto_grow(this)" id="sts_textArea" class="form-control mb-3" style="height: auto;" rows="2"></textarea>
         </div>
         <div class="text-center">
             <button id="sts_sendButton" type="button" class="btn btn-primary btn-sl">Share</button>
@@ -29,6 +34,12 @@
         const textArea = document.getElementById('sts_textArea');
         const sendButton = document.getElementById('sts_sendButton');
         textArea.value = ""
+
+        function auto_grow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight) + "px";
+        }
+
 
         sendButton.addEventListener('click', () => {
             const text = textArea.value;

@@ -10,6 +10,11 @@
                 font-size: 1.5rem;
             }
         }
+        textarea {
+        resize: none;
+        overflow: hidden;
+        min-height: 50px;
+        }
     </style>
 </head>
 <body>
@@ -23,7 +28,7 @@
                 </div>
             </div>
             <button onClick=getText() id="get_text" type="button" class="btn btn-primary btn-sl">Get</button>
-            <textarea id="gtu_myInput" class="form-control mb-2 mt-3" rows="2"></textarea>
+            <textarea oninput="auto_grow(this)" id="gtu_myInput" style="height: auto;" class="form-control mb-2 mt-3" rows="2"></textarea>
         </div>
         <div class="text-center">
             <button onclick="copyFunction()" type="button" class="btn btn-success mt-1">Copy</button>
@@ -36,9 +41,14 @@
         var get_uniqueID = document.getElementById("gtu_uniqueid");
         get_uniqueID.value = ""
         receivedText.value = ""
+
+        function auto_grow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight) + "px";
+        }
+
         function getText() {
             const uid = get_uniqueID.value;
-
             fetch('/receive', {
                 method: 'POST',
                 headers: {
@@ -69,6 +79,7 @@
         
         function updateReceivedText(text) {
             receivedText.value = text;
+            auto_grow(receivedText)
         }
         function showSuccessMessage() {
             const successMessage = document.getElementById('successMessage');
