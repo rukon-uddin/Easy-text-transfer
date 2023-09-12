@@ -15,10 +15,10 @@ random_char_len = len(combinations_as_strings)
 app = Flask(__name__)
 
 
-ext = "redis://red-cjk4je337aks73ek7ilg:6379"
-redis_client = redis.StrictRedis.from_url(ext)
+# ext = "redis://red-cjk4je337aks73ek7ilg:6379"
+# redis_client = redis.StrictRedis.from_url(ext)
 
-# redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
 
 
 @app.route('/')
@@ -54,11 +54,12 @@ def send_text():
     except:
         print("No data found")
     
-    unique_id = combinations_as_strings[glob_counter % random_char_len]
+    rand_number = random.randint(0 , random_char_len-1)
+    unique_id = combinations_as_strings[rand_number]
 
     while redis_client.hget("stored_text", unique_id) != None:
-        unique_id = combinations_as_strings[glob_counter % random_char_len]
-        glob_counter = (glob_counter+1)%random_char_len
+        rand_number = random.randint(0 , random_char_len-1)
+        unique_id = combinations_as_strings[rand_number]
 
     data = request.json
     entry = {
