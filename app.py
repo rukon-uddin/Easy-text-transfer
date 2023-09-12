@@ -15,10 +15,10 @@ random_char_len = len(combinations_as_strings)
 app = Flask(__name__)
 
 
-# ext = "redis://red-cjk4je337aks73ek7ilg:6379"
-# redis_client = redis.StrictRedis.from_url(ext)
+ext = "redis://red-cjk4je337aks73ek7ilg:6379"
+redis_client = redis.StrictRedis.from_url(ext)
 
-redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+# redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
 
 
 @app.route('/')
