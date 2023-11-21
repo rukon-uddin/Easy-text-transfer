@@ -15,6 +15,18 @@
         overflow: hidden;
         min-height: 50px;
         }
+        body {
+            margin-bottom: 60px; /* Adjust this value based on your footer's height */
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f4f4f4;
+            padding: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -35,6 +47,9 @@
         </div>
         
     </div>
+    <footer>
+        <p>Copyright © 2023 Rukon Uddin. All rights reserved | <a style="text-decoration: None;" href="https://github.com/rukon-uddin/Easy-text-transfer/blob/main/LICENSE">License</a></p>
+    </footer>
     
     <script>
         const receivedText = document.getElementById('gtu_myInput');
