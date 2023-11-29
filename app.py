@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 # ext = "redis://red-cjk4je337aks73ek7ilg:6379"
 # redis_client = redis.StrictRedis.from_url(ext)
-ext = "rediss://default:AVNS_izulChFNKXGqMVv70Ss@private-db-redis-nyc1-74113-do-user-14651351-0.b.db.ondigitalocean.com:25061"
+ext = "redis://red-cljlrd1ll56s73blvii0:6379"
 redis_client = redis.StrictRedis.from_url(ext)
 
 
