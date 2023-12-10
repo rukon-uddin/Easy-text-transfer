@@ -8,7 +8,7 @@ import qrcode
 import os
 
 glob_counter = 0
-characters = string.ascii_letters + string.digits + string.punctuation
+characters = string.ascii_letters + string.digits
 combinations = itertools.product(characters, repeat=2)
 combinations_as_strings = [''.join(combination) for combination in combinations]
 random_char_len = len(combinations_as_strings)
@@ -76,7 +76,8 @@ def send_text():
     redis_client.hset('stored_text', unique_id, "4099058".join(entry.values()))
 
     qr_path = f"static/qrcode_{unique_id}.png"
-    text_qr = f"http://192.168.10.92:8080/qrText?param1={unique_id}"
+    # text_qr = f"https://easytt.rukonu.com/qrText?param1={unique_id}"
+    text_qr = f"https://easytt.rukonu.com/qrText?param1={unique_id}"
     qr_img = qrcode.make(text_qr)
     qr_img.save(qr_path)
     # print(redis_client.hgetall('stored_text'))
@@ -116,9 +117,8 @@ def qrText():
         text = stored_entry[1]
         redis_client.hdel("stored_text", stored_entry[0])
 
-    print("***** ", text)
     return render_template('qrShow.html', result=text, uid=param1)
 
 
-# if __name__ == "__main__":
-#     app.run(debug=True, host="0.0.0.0", port=8080)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
