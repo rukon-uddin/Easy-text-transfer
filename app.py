@@ -4,6 +4,8 @@ import redis
 import itertools
 import string
 import random
+import qrcode
+import os
 
 glob_counter = 0
 characters = string.ascii_letters + string.digits + string.punctuation
@@ -17,7 +19,8 @@ app = Flask(__name__)
 
 # ext = "redis://red-cjk4je337aks73ek7ilg:6379"
 # redis_client = redis.StrictRedis.from_url(ext)
-ext = "redis://red-cljlrd1ll56s73blvii0:6379"
+# ext = "redis://red-cljlrd1ll56s73blvii0:6379"
+ext = "redis://localhost:6379/0" 
 redis_client = redis.StrictRedis.from_url(ext)
 
 
@@ -71,9 +74,13 @@ def send_text():
         "timestamp": str(time.time())
     }
     redis_client.hset('stored_text', unique_id, "4099058".join(entry.values()))
-    
+
+    qr_path = f"static/qrcode_{unique_id}.png"
+    text_qr = f"http://192.168.10.92:8080/qrText?param1={unique_id}"
+    qr_img = qrcode.make(text_qr)
+    qr_img.save(qr_path)
     # print(redis_client.hgetall('stored_text'))
-    return jsonify({'message': unique_id})
+    return jsonify({'message': unique_id, 'qr_path': qr_path})
 
 
 
@@ -88,13 +95,30 @@ def receive_text():
         text = "ZqgQ9QOE2$sq5kr8p3Vg*GgGNq&"
     else:
         stored_entry = stored_entry.decode('utf-8').split('4099058')
+        os.remove(f"static/qrcode_{data['uid']}.png")
         text = stored_entry[1]
         redis_client.hdel("stored_text", stored_entry[0])
     
     
     return jsonify({'text': text})
 
+@app.route('/qrText', methods=["GET"])
+def qrText():
+    param1 = request.args.get('param1')
+
+    stored_entry = redis_client.hget('stored_text', param1)
+
+    if stored_entry is None:
+        text = "ZqgQ9QOE2$sq5kr8p3Vg*GgGNq&"
+    else:
+        stored_entry = stored_entry.decode('utf-8').split('4099058')
+        os.remove(f"static/qrcode_{param1}.png")
+        text = stored_entry[1]
+        redis_client.hdel("stored_text", stored_entry[0])
+
+    print("***** ", text)
+    return render_template('qrShow.html', result=text, uid=param1)
 
 
 # if __name__ == "__main__":
-#     app.run(debug=True)
+#     app.run(debug=True, host="0.0.0.0", port=8080)

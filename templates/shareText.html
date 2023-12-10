@@ -39,6 +39,10 @@
             <button id="sts_sendButton" type="button" class="btn btn-primary btn-sl">Share</button>
             <p id="successMessage" class="text-success mt-2" style="display: none;">Text shared successfully!</p>
             <p id="uniqueIDField" class="text-success mt-2" style="display: none;"></p>
+            
+            <div class="d-flex justify-content-center align-items-center">
+                <img id="qrCodeImage" src="" style="display: none; width: 10%; max-width: 300px; height: auto;" alt="QR Code">
+            </div>
         </div>
     </div>
     <footer>
@@ -49,6 +53,7 @@
         const textArea = document.getElementById('sts_textArea');
         const sendButton = document.getElementById('sts_sendButton');
         textArea.value = ""
+        const qrCodeImage = document.getElementById('qrCodeImage');
 
         function auto_grow(element) {
             element.style.height = "5px";
@@ -58,7 +63,6 @@
 
         sendButton.addEventListener('click', () => {
             const text = textArea.value;
-            console.log(text)
             fetch('/send', {
                 method: 'POST',
                 headers: {
@@ -70,6 +74,8 @@
             .then(data => {
                 if (data.message) {
                     showSuccessMessage(data.message);
+                    qrCodeImage.src = data.qr_path;
+                    qrCodeImage.style.display = 'block';
                 }
             })
             .catch(error => {
@@ -83,10 +89,11 @@
         function showSuccessMessage(data) {
             const successMessage = document.getElementById('successMessage');
             const uniqueIDField = document.getElementById('uniqueIDField');
+            
             successMessage.style.display = 'block';
             uniqueIDField.style.display = 'block';
             uniqueIDField.innerText = `Your unique ID is: ${data}`;
-        }
+        } 
 
     </script>
 </body>
