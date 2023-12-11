@@ -76,13 +76,11 @@ def send_text():
     redis_client.hset('stored_text', unique_id, "4099058".join(entry.values()))
 
     qr_path = f"static/qrcode_{unique_id}.png"
-    # text_qr = f"https://easytt.rukonu.com/qrText?param1={unique_id}"
     text_qr = f"https://easytt.rukonu.com/qrText?param1={unique_id}"
     qr_img = qrcode.make(text_qr)
     qr_img.save(qr_path)
     # print(redis_client.hgetall('stored_text'))
     return jsonify({'message': unique_id, 'qr_path': qr_path})
-
 
 
 @app.route('/receive', methods=['POST'])
