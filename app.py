@@ -6,6 +6,7 @@ import string
 import random
 import qrcode
 import os
+from flask_socketio import SocketIO, emit
 
 glob_counter = 0
 characters = string.ascii_letters + string.digits
@@ -20,6 +21,8 @@ app = Flask(__name__)
 # ext = "redis://red-cjk4je337aks73ek7ilg:6379"
 # redis_client = redis.StrictRedis.from_url(ext)
 # ext = "redis://red-cljlrd1ll56s73blvii0:6379"
+
+# Current
 ext = "redis://localhost:6379/0" 
 redis_client = redis.StrictRedis.from_url(ext)
 
