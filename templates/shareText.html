@@ -28,7 +28,6 @@
 </head>
 <body>
     <main>
-
         <div class="container mt-2">
             <div class="text-center">
                 <h1>Simple Text Share</h1>
@@ -40,7 +39,7 @@
                 <p id="uniqueIDField" class="text-success mt-2" style="display: none;"></p>
                 
                 <div class="d-flex justify-content-center align-items-center">
-                    <img id="qrCodeImage" src="" style="display: none; width: 15%; max-width: 300px; height: auto;" alt="QR Code">
+                    <img id="qrCodeImage" src="" style="display: none; width: 35%; max-width: 300px; height: auto;" alt="QR Code">
                 </div>
             </div>
         </div>
@@ -70,6 +69,7 @@
             .then(data => {
                 if (data.message) {
                     showSuccessMessage(data.message);
+                    qr_path = data.qr_path.replace("/home/Easy-text-transfer", "https://easytt.rukonu.com")
                     qrCodeImage.src = data.qr_path;
                     qrCodeImage.style.display = 'block';
                 }
