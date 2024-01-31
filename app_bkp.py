@@ -6,7 +6,6 @@ import string
 import random
 import qrcode
 import os
-from flask_socketio import SocketIO, emit
 
 glob_counter = 0
 characters = string.ascii_letters + string.digits
@@ -15,14 +14,12 @@ combinations_as_strings = [''.join(combination) for combination in combinations]
 random_char_len = len(combinations_as_strings)
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 
 # ext = "redis://red-cjk4je337aks73ek7ilg:6379"
 # redis_client = redis.StrictRedis.from_url(ext)
 # ext = "redis://red-cljlrd1ll56s73blvii0:6379"
-
-# Current
 ext = "redis://localhost:6379/0" 
 redis_client = redis.StrictRedis.from_url(ext)
 
@@ -76,14 +73,15 @@ def send_text():
         "text": str(data['text']),
         "timestamp": str(time.time())
     }
+
     redis_client.hset('stored_text', unique_id, "4099058".join(entry.values()))
 
-    qr_path = f"static/qrcode_{unique_id}.png"
-    text_qr = f"https://easytt.rukonu.com/qrText?param1={unique_id}"
+    qr_path = f"/home/Easy-text-transfer/static/qrcode_{unique_id}.png"
+    text_qr = f"http://easytt.rukonu.com/qrText?param1={unique_id}"
     qr_img = qrcode.make(text_qr)
     qr_img.save(qr_path)
     # print(redis_client.hgetall('stored_text'))
-    return jsonify({'message': unique_id, 'qr_path': qr_path})
+    return jsonify({'message':unique_id, 'qr_path': qr_path})
 
 
 @app.route('/receive', methods=['POST'])
@@ -97,12 +95,12 @@ def receive_text():
         text = "ZqgQ9QOE2$sq5kr8p3Vg*GgGNq&"
     else:
         stored_entry = stored_entry.decode('utf-8').split('4099058')
-        os.remove(f"static/qrcode_{data['uid']}.png")
+        os.remove(f"/home/Easy-text-transfer/static/qrcode_{data['uid']}.png")
         text = stored_entry[1]
         redis_client.hdel("stored_text", stored_entry[0])
     
-    
     return jsonify({'text': text})
+
 
 @app.route('/qrText', methods=["GET"])
 def qrText():
@@ -114,7 +112,7 @@ def qrText():
         text = "ZqgQ9QOE2$sq5kr8p3Vg*GgGNq&"
     else:
         stored_entry = stored_entry.decode('utf-8').split('4099058')
-        os.remove(f"static/qrcode_{param1}.png")
+        os.remove(f"/home/Easy-text-transfer/static/qrcode_{param1}.png")
         text = stored_entry[1]
         redis_client.hdel("stored_text", stored_entry[0])
 
